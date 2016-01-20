@@ -4,10 +4,19 @@ node {
    docker.withRegistry('https://docker.example.com/', 'docker-registry-login') {
 
      stage 'build'
-     def app_image = docker.build('nodejs_demo','.')
-     def app_container = app_image.run('-i -p 8082:3000 --name nodejs_demo')
+     sh 'cp Dockerfile_app Dockerfile'
+     def app_image = docker.build('nodejs-demo','.')
+     def app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo')
 
-     input "How does integration look?"
+     input "How does app look?"
+     app_container.stop()
+
+     stage 'test'
+     sh 'cp Dockerfile_test Dockerfile'
+     app_image = docker.build('nodejs-demo-test','.')
+     app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo-test')
+
+     input "How does test look?"
      app_container.stop()
    }
 }
