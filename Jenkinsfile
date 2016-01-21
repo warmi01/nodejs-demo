@@ -19,6 +19,7 @@ node {
      app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo-test')
      
      sh 'docker inspect ' + app_container.id + ' > container-info.txt 2>&1'
+     echo $?
      def text = readFile('container-info.txt')
      echo 'exitCode = ' + getContainerExitCode(text)
 
@@ -29,7 +30,7 @@ node {
 
 @NonCPS
 def getContainerExitCode(String text) {
-     return new JsonSlurper().parseText(text).State.ExitCode
+     //return new JsonSlurper().parseText(text).State.ExitCode
 }
 
 public class ContainerInfo {
