@@ -18,7 +18,7 @@ node {
      app_image = docker.build('nodejs-demo-test','.')
      app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo-test')
      
-     sh 'docker inspect ' + app_container.id + ' > container-info.txt'
+     sh 'docker inspect ' + app_container.id + ' > container-info.txt 2>&1'
      def object = parseContainerInfo('container-info.txt')
      echo 'exitCode = ' + object.State.ExitCode
 
