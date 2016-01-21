@@ -20,7 +20,7 @@ node {
      sh "docker logs ${app_container.id}"
      sh "docker inspect --format '{{.State.ExitCode}}' ${app_container.id} > container-info.txt"
      def text = readFile('container-info.txt').trim()
-     echo 'exitCode = ' + getContainerExitCode(text)
+     echo "exitCode = ${text}"
 
      input "How does test look?"
      app_container.stop()
