@@ -32,6 +32,7 @@ def parseContainerInfo(String fileName) {
      echo 'i am here'	 
      echo fileName	 
      def text = readFile(fileName)
+     echo 'read file'
      text = '''[
     {
     "Id": "25bf88b0c7f93c546d7ff614071c7739600d4556a40e921cd58cb90fdb861504",
@@ -52,10 +53,12 @@ def parseContainerInfo(String fileName) {
         "StartedAt": "2016-01-21T15:52:11.296466333Z",
         "FinishedAt": "2016-01-21T15:52:15.651625299Z"
     }]'''
+     echo 'parsing info'
      def json = new JsonSlurper().parseText(text)
+     echo 'parsed it'
      echo json
      json.each{
-       println it
+       echo it
      }
      echo 'that was it'
      return json
