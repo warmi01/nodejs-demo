@@ -22,7 +22,7 @@ node {
      //def text = readFile('container-info.txt')
      //echo 'exitCode = ' + getContainerExitCode(text)
 
-     sh 'docker run -d -i -p 8082:3000 --name nodejs-demo-test nodejs-demo-test; echo $? > status'
+     sh 'docker run -i -p 8082:3000 --name nodejs-demo-test nodejs-demo-test; echo $? > status'
      def r = readFile('status').trim()
      echo 'exit code = ' + r
 
