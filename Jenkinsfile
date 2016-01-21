@@ -30,8 +30,7 @@ node {
 @NonCPS
 def parseContainerInfo(String fileName) {
      def file = new File(fileName)
-     def jsonParser = new JsonSlurper()
-    return jsonParser.parse(file)
+     return new JsonSlurper(file).parse(file)
 }
 
 public class ContainerInfo {
