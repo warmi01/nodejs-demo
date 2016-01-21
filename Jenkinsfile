@@ -19,7 +19,10 @@ node {
      app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo-test')
      
      sh 'docker inspect ' + app_container.id + ' > container-info.txt 2>&1'
-     def object = parseContainerInfo('container-info.txt')
+     def text = readFile('container-info.txt')
+     echo 'read file'
+     def object = parseContainerInfo(text)
+
      //echo 'exitCode = ' + object.State.ExitCode
 
      input "How does test look?"
@@ -28,11 +31,9 @@ node {
 }
 
 @NonCPS
-def parseContainerInfo(String fileName) {
+def parseContainerInfo(String text) {
      echo 'i am here'	 
-     echo fileName	 
-     def text = readFile(fileName)
-     echo 'read file'
+     echo text	 
      text = '''[
     {
     "Id": "25bf88b0c7f93c546d7ff614071c7739600d4556a40e921cd58cb90fdb861504",
