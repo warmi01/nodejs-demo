@@ -20,7 +20,7 @@ node {
      
      sh 'docker inspect ' + app_container.id + ' > container-info.txt 2>&1'
      def object = parseContainerInfo('container-info.txt')
-     echo 'exitCode = ' + object.State.ExitCode
+     //echo 'exitCode = ' + object.State.ExitCode
 
      input "How does test look?"
      app_container.stop()
