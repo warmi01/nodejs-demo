@@ -29,12 +29,15 @@ node {
 
 @NonCPS
 def parseContainerInfo(String fileName) {
+     echo 'i am here'	 
      def text = readFile(fileName)
-     println text
+     echo text
      def json = new JsonSlurper().parseText(text)
+     echo json
      json.each{
        println it
      }
+     echo 'that was it'
      return json
 }
 
