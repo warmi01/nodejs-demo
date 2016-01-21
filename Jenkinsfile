@@ -30,8 +30,28 @@ node {
 @NonCPS
 def parseContainerInfo(String fileName) {
      echo 'i am here'	 
+     echo fileName	 
      def text = readFile(fileName)
-     echo text
+     text = '''[
+    {
+    "Id": "25bf88b0c7f93c546d7ff614071c7739600d4556a40e921cd58cb90fdb861504",
+    "Created": "2016-01-21T15:52:08.679621567Z",
+    "Path": "npm",
+    "Args": [
+        "test"
+    ],
+    "State": {
+        "Running": false,
+        "Paused": false,
+        "Restarting": false,
+        "OOMKilled": false,
+        "Dead": false,
+        "Pid": 0,
+        "ExitCode": 0,
+        "Error": "",
+        "StartedAt": "2016-01-21T15:52:11.296466333Z",
+        "FinishedAt": "2016-01-21T15:52:15.651625299Z"
+    }]'''
      def json = new JsonSlurper().parseText(text)
      echo json
      json.each{
