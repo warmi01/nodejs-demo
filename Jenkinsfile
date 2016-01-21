@@ -23,7 +23,7 @@ node {
      //echo 'exitCode = ' + getContainerExitCode(text)
 
      //sh 'docker inspect ' + app_container.id
-     echo 'exit code = ' \$? 
+     echo 'exit code = ' + \$? 
 
      input "How does test look?"
      app_container.stop()
