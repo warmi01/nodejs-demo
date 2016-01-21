@@ -37,10 +37,6 @@ def parseContainerInfo(String text) {
      echo 'parsing info'
      def json = new JsonSlurper().parseText(text)
      echo 'parsed it'
-     json.each{
-       echo it
-     }
-     echo 'that was it'
      return json
 }
 
