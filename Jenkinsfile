@@ -16,27 +16,14 @@ node {
      stage 'test'
      sh 'cp Dockerfile_test Dockerfile'
      app_image = docker.build('nodejs-demo-test','.')
-     //app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo-test')
-     
-     //sh 'docker inspect ' + app_container.id + ' > container-info.txt 2>&1'
-     //def text = readFile('container-info.txt')
-     //echo 'exitCode = ' + getContainerExitCode(text)
-
-     sh 'docker run -i -p 8082:3000 --name nodejs-demo-test nodejs-demo-test; echo $? > status'
-     def r = readFile('status').trim()
-     echo 'exit code = ' + r
+     app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo-test')
+     sh 'docker logs ${app_container.id}'
+     sh 'docker inspect --format ''{{.State.ExitCode}}'' ${app_container.id} > container-info.txt'
+     def text = readFile('container-info.txt').trim()
+     echo 'exitCode = ' + getContainerExitCode(text)
 
      input "How does test look?"
      app_container.stop()
    }
-}
-
-@NonCPS
-def getContainerExitCode(String text) {
-     //return new JsonSlurper().parseText(text).State.ExitCode
-}
-
-public class ContainerInfo {
-
 }
 
