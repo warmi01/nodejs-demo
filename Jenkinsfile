@@ -18,15 +18,20 @@ node {
      app_image = docker.build('nodejs-demo-test','.')
      app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo-test')
      
-     def jsonParser = new JsonSlurper()
      sh 'docker inspect ' + app_container.id + ' > container-info.txt'
-     def file = new File('container-info.txt')
-     def object = jsonParser.parse(file)
+     def object = parseContainerInfo('container-info.txt')
      echo 'exitCode = ' + object[0].State.ExitCode
 
      input "How does test look?"
      app_container.stop()
    }
+}
+
+@NonCPS
+def parseContainerInfo(String fileName) {
+     def file = new File(fileName)
+     def jsonParser = new JsonSlurper()
+    return jsonParser.parse(file)
 }
 
 public class ContainerInfo {
