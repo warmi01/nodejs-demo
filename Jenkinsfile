@@ -23,7 +23,7 @@ node {
      echo 'read file'
      def object = parseContainerInfo(text)
 
-     //echo 'exitCode = ' + object.State.ExitCode
+     echo 'exitCode = ' + object.State.ExitCode
 
      input "How does test look?"
      app_container.stop()
@@ -32,8 +32,6 @@ node {
 
 @NonCPS
 def parseContainerInfo(String text) {
-     echo 'i am here'	 
-     echo text	 
      echo 'parsing info'
      def json = new JsonSlurper().parseText(text)
      echo 'parsed it'
