@@ -22,8 +22,8 @@ node {
      //def text = readFile('container-info.txt')
      //echo 'exitCode = ' + getContainerExitCode(text)
 
-     def exitCode = 'docker inspect ' + app_container.id + ''.execute().exitValue()
-     echo 'exit code = ' + exitCode
+     sh 'docker inspect ' + app_container.id
+     echo 'exit code = $$?' 
 
      input "How does test look?"
      app_container.stop()
