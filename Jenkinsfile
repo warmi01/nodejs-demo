@@ -20,10 +20,7 @@ node {
      
      sh 'docker inspect ' + app_container.id + ' > container-info.txt 2>&1'
      def text = readFile('container-info.txt')
-     echo 'read file'
-     def object = parseContainerInfo(text)
-
-     echo 'exitCode = ' + object.State.ExitCode
+     echo 'exitCode = ' + getContainerExitCode(text)
 
      input "How does test look?"
      app_container.stop()
@@ -31,11 +28,8 @@ node {
 }
 
 @NonCPS
-def parseContainerInfo(String text) {
-     echo 'parsing info'
-     def json = new JsonSlurper().parseText(text)
-     echo 'parsed it'
-     return json
+def getContainerExitCode(String text) {
+     return new JsonSlurper().parseText(text).State.ExitCode
 }
 
 public class ContainerInfo {
