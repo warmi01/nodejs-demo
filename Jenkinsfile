@@ -17,8 +17,8 @@ node {
      sh 'cp Dockerfile_test Dockerfile'
      app_image = docker.build('nodejs-demo-test','.')
      app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo-test')
-     sh "docker logs ${app_container.id}"
-     sh "docker inspect --format '{{.State.ExitCode}}' ${app_container.id} > container-info.txt"
+     docker.script.sh "docker logs ${app_container.id}"
+     docker.script.sh "docker inspect --format '{{.State.ExitCode}}' ${app_container.id} > container-info.txt"
      def text = readFile('container-info.txt').trim()
      echo "exitCode = ${text}"
 
