@@ -18,10 +18,12 @@ node {
      app_image = docker.build('nodejs-demo-test','.')
      app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo-test')
      
-     sh 'docker inspect ' + app_container.id + ' > container-info.txt 2>&1'
-     echo $?
-     def text = readFile('container-info.txt')
-     echo 'exitCode = ' + getContainerExitCode(text)
+     //sh 'docker inspect ' + app_container.id + ' > container-info.txt 2>&1'
+     //def text = readFile('container-info.txt')
+     //echo 'exitCode = ' + getContainerExitCode(text)
+
+     def exitCode = 'docker inspect ' + app_container.id + ''.execute().exitValue()
+     echo 'exit code = ' + exitCode
 
      input "How does test look?"
      app_container.stop()
