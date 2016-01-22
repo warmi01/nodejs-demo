@@ -1,7 +1,6 @@
 
-import org.jenkinsci.plugins.docker.workflow.Docker
-
 node {
+
    checkout scm
 
    docker.withRegistry('https://docker.example.com/', 'docker-registry-login') {
