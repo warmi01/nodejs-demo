@@ -1,4 +1,6 @@
 
+import org.jenkinsci.plugins.docker.workflow.Docker
+
 node {
    checkout scm
 
@@ -30,6 +32,22 @@ node {
    }
 
 }
+
+ public static class Container implements Serializable {
+
+        private final Docker docker;
+        public final String id;
+
+        private Container(Docker docker, String id) {
+            this.docker = docker
+            this.id = id
+        }
+
+        public void stop() {
+            docker.script.sh "docker stop ${id} && docker rm -f ${id}"
+        }
+
+    }
 
         def runAttached(image, args) {
             docker.node {
