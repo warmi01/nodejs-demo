@@ -1,4 +1,3 @@
-import groovy.json.JsonSlurper
 
 node {
    checkout scm
@@ -17,7 +16,8 @@ node {
      sh 'cp Dockerfile_test Dockerfile'
      app_image = docker.build('nodejs-demo-test','.')
      app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo-test')
-     for (def running = true; running == true; running = readFile('.running').trim()) {
+     echo 'entering loop..'
+     for (def running = true; running; running = readFile('.running').trim()) {
         echo 'still chugging..'
         docker.script.sh "docker inspect --format '{{.State.Running}}' ${app_container.id} > .running"
      }
