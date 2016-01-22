@@ -17,6 +17,7 @@ node {
      sh 'cp Dockerfile_test Dockerfile'
      app_image = docker.build('nodejs-demo-test','.')
      app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo-test')
+     sleep 2
      docker.script.sh "docker logs ${app_container.id} > .logs 2>&1"
      def logs = readFile('.logs').trim()
      echo logs
