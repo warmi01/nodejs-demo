@@ -19,6 +19,7 @@ node {
      for (def running = true; running == true; running = readFile('.running').trim()) {
         docker.script.sh "docker inspect --format '{{.State.Running}}' ${app_container.id} > .running"
      }
+     sleep 10
      docker.script.sh "docker logs ${app_container.id} > .logs 2>&1"
      def logs = readFile('.logs').trim()
      echo logs
