@@ -34,17 +34,16 @@ node {
 
 }
 
-
-        def runAttached(image, args) {
-            docker.node {
-                try {
-                 docker.script.sh "rm .container"
-                }
-                catch (all) {} 
-                docker.script.sh "docker run --cidfile=.container ${args != '' ? ' ' + args : ''} ${image.id}"
-                def container = docker.script.readFile('.container').trim()
-                docker.script.dockerFingerprintRun containerId: container, toolName: docker.script.env.DOCKER_TOOL_NAME
-                return container
-            }
-        }
+def runAttached(image, args) {
+   docker.node {
+       try {
+        docker.script.sh "rm .container"
+       }
+       catch (all) {} 
+       docker.script.sh "docker run --cidfile=.container ${args != '' ? ' ' + args : ''} ${image.id}"
+       def container = docker.script.readFile('.container').trim()
+       docker.script.dockerFingerprintRun containerId: container, toolName: docker.script.env.DOCKER_TOOL_NAME
+       return container
+   }
+}
 
