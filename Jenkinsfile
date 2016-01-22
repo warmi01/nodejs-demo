@@ -16,9 +16,7 @@ node {
      sh 'cp Dockerfile_test Dockerfile'
      app_image = docker.build('nodejs-demo-test','.')
      app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo-test')
-     echo 'entering loop..'
-     for (def running = true; running; running = readFile('.running').trim()) {
-        echo 'still chugging..'
+     for (def running = true; running == true; running = readFile('.running').trim()) {
         docker.script.sh "docker inspect --format '{{.State.Running}}' ${app_container.id} > .running"
      }
      docker.script.sh "docker logs ${app_container.id} > .logs 2>&1"
