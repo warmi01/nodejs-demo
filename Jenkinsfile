@@ -8,7 +8,7 @@ node {
      stage 'build'
      sh 'cp Dockerfile_app Dockerfile'
      def app_image = docker.build('nodejs-demo','.')
-     def app_container = app_image.run('-i --name nodejs-demo')
+     def app_container = app_image.run('-i --name nodejs-demo' + env.BUILD_ID)
 
      input "How does app look?"
      app_container.stop()
@@ -16,7 +16,7 @@ node {
      stage 'test'
      sh 'cp Dockerfile_test Dockerfile'
      app_image = docker.build('nodejs-demo-test','.')
-     //app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo-test')
+     //app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo-test' + env.BUILD_ID)
      //sleep 5
      //docker.script.sh "docker logs ${app_container.id} > .logs 2>&1"
      //def logs = readFile('.logs').trim()
