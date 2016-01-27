@@ -8,7 +8,7 @@ node {
      stage 'build'
      sh 'cp Dockerfile_app Dockerfile'
      def app_image = docker.build('nodejs-demo','.')
-     def app_container = app_image.run('-i -p 8082:3000 --name nodejs-demo')
+     def app_container = app_image.run('-i --name nodejs-demo')
 
      input "How does app look?"
      app_container.stop()
@@ -24,7 +24,7 @@ node {
      //docker.script.sh "docker inspect --format '{{.State.ExitCode}}' ${app_container.id} > .status"
      //def status = readFile('.status').trim()
      //echo "exitCode = ${status}"
-     def id = runAttached(app_image, '-i -p 8082:3000 --name nodejs-demo-test')
+     def id = runAttached(app_image, '-i --name nodejs-demo-test')
 
      input "How does test look?"
      //app_container.stop()
