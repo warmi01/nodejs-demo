@@ -7,14 +7,14 @@ node {
 
      stage 'build'
      def app_image = docker.build('nodejs-demo','src/demo-app')
-     def app_container = app_image.run('-i --name nodejs-demo' + env.BUILD_ID)
+     def app_container = app_image.run('-i --name nodejs-demo-' + env.BUILD_ID)
 
      input "How does app look?"
      app_container.stop()
 
      stage 'test'
      app_image = docker.build('nodejs-demo-test','src/demo-app-tests')
-     def id = runAttached(app_image, '-i --name nodejs-demo-test')
+     def id = runAttached(app_image, '-i --name nodejs-demo-test-'  + env.BUILD_ID)
 
      input "How does test look?"
      //app_container.stop()
