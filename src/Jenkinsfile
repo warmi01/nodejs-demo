@@ -3,8 +3,8 @@ node {
 
    checkout scm
 
-   docker.withRegistry('https://docker.example.com/', 'docker-registry-login') {
-
+   //docker.withRegistry('https://docker.example.com/', 'docker-registry-login') {
+   docker.withTool('my-docker')  {
      stage 'build'
      def app_image = docker.build('nodejs-demo','src/demo-app')
      def app_container = app_image.run('-i --name nodejs-demo-' + env.BUILD_ID)
