@@ -7,18 +7,19 @@ node {
 
      stage 'build'
      def app_image = docker.build('nodejs-demo','src/demo-app')
-     def app_container = app_image.run('-i --name nodejs-demo-' + env.BUILD_ID)
+     def app_container = app_image.run("-i --name nodejs-demo-${env.BUILD_ID}")
 
-     input "How does app look?"
+     stage 'unit tests'
+     app_image = docker.build('nodejs-demo-unit-tests','src/demo-app-unit-tests')
+     def unit-id = runAttached(app_image, "-i --name nodejs-demo-unit-tests-${env.BUILD_ID}")
+
+     stage 'integration tests'
+     app_image = docker.build('nodejs-demo-int-tests','src/demo-app-int-tests')
+     def int-id = runAttached(app_image, "-i --link nodejs-demo-${env.BUILD_ID}:demohost --name nodejs-demo-int-tests-${env.BUILD_ID}")
+
      app_container.stop()
-
-     stage 'test'
-     app_image = docker.build('nodejs-demo-test','src/demo-app-tests')
-     def id = runAttached(app_image, '-i --name nodejs-demo-test-'  + env.BUILD_ID)
-
-     input "How does test look?"
-     //app_container.stop()
-     docker.script.sh "docker stop ${id} && docker rm -f ${id}"
+     docker.script.sh "docker stop ${unit-id} && docker rm -f ${unit-id}"
+     docker.script.sh "docker stop ${int-id} && docker rm -f ${int-id}"
    }
 
 }
