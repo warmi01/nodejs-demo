@@ -20,7 +20,7 @@ node {
      docker.script.sh "docker stop ${unit_id} && docker rm -f ${unit_id}"
      docker.script.sh "docker stop ${int_id} && docker rm -f ${int_id}"
      
-     def buildtag = readFile 'version.txt' + '.' + ${env.BUILD_ID}
+     def buildtag = readFile 'src/version.txt' + '.' + ${env.BUILD_ID}
      app_image.tag(${buildtag});
      app_unit_image.tag(${buildtag});
      app_int_image.tag(${buildtag});
