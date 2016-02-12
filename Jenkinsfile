@@ -4,6 +4,7 @@ node {
    checkout scm
 
    docker.withRegistry('https://docker.example.com/', 'docker-registry-login') {
+   
      stage 'build'
      def app_image = docker.build('nodejs-demo','src/demo-app')
      def app_container = app_image.run("-i --name nodejs-demo-${env.BUILD_ID}")
@@ -24,6 +25,7 @@ node {
 }
 
 def runAttached(image, args) {
+
    docker.node {
        try {
         docker.script.sh "rm .container"
