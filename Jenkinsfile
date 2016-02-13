@@ -21,7 +21,7 @@ node {
      docker.script.sh "docker stop ${int_id} && docker rm -f ${int_id}"
      
      def version = readFile 'src/version.txt' 
-     def buildtag = "${version}.${env.BUILD_ID}"
+     def buildtag = "${version.trim()}.${env.BUILD_ID}"
      app_image.tag("${buildtag}");
      app_unit_image.tag("${buildtag}");
      app_int_image.tag("${buildtag}");
