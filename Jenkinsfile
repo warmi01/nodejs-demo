@@ -34,7 +34,7 @@ node {
       }
       finally
       {
-         cleanup()
+         cleanup(app_container, unit_container_id, int_container_id)
       }    
    //}
 }
@@ -90,7 +90,7 @@ def testResults(container, stage) {
   }
 }
 
-def cleanup() {
+def cleanup(app_container, unit_container_id, int_container_id) {
 
   parallel "Stop demo app container":
   {
@@ -98,7 +98,7 @@ def cleanup() {
    {
       app_container.stop()
    }
-   catch (all) {echo 'oops! 1'}
+   catch (all) {echo 'Error stopping demo app container'}
   },
   "Stop unit tests container":
   {
@@ -106,7 +106,7 @@ def cleanup() {
    {
       docker.script.sh "docker stop ${unit_container_id} && docker rm -f ${unit_container_id}"
    }
-   catch (all) {echo 'oops! 2'}
+   catch (all) {echo 'Error stopping unit tests container'}
   },
   "Stop integration tests container":
   {
@@ -114,7 +114,7 @@ def cleanup() {
    {
       docker.script.sh "docker stop ${int_container_id} && docker rm -f ${int_container_id}"
    }
-   catch (all) {echo 'oops! 3'}
+   catch (all) {echo 'Error stopping integration tests container''}
   },
   failFast: false
 
