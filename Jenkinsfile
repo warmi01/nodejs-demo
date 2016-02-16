@@ -92,9 +92,7 @@ def cleanup() {
    {
       app_container.stop()
    }
-   catch (all)
-   {    
-   }
+   catch (all) {}
   },
   "Stop unit tests container":
   {
@@ -102,9 +100,7 @@ def cleanup() {
    {
       docker.script.sh "docker stop ${unit_container_id} && docker rm -f ${unit_container_id}"
    }
-   catch (all)
-   {
-   }
+   catch (all) {}
   },
   "Stop integration tests container":
   {
@@ -112,9 +108,7 @@ def cleanup() {
    {
       docker.script.sh "docker stop ${int_container_id} && docker rm -f ${int_container_id}"
    }
-   catch (all)
-   {
-   }
+   catch (all) {}
   },
   failFast: false
 
