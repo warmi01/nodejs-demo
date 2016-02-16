@@ -1,58 +1,30 @@
+
+def app_image, app_unit_image, app_int_image, app_container, unit_container_id, int_container_id
+
 node {
 
    checkout scm
 
    docker.withRegistry('https://docker.example.com/', 'docker-registry-login') {
    
-      def app_image, app_unit_image, app_int_image, app_container, unit_container_id, int_container_id
-
       try
       {
         def version = readFile 'src/version.txt' 
         def imagetag = "${version.trim()}.${env.BUILD_ID}"
    
         stage 'build'
-        parallel "Building Docker demo app image":
-        {
-            app_image = docker.build("nodejs-demo:${imagetag}",'src/demo-app')
-        },
-        "Building Docker unit tests image":
-        {
-            app_unit_image = docker.build("nodejs-demo-unit-tests:${imagetag}",'src/demo-app-unit-tests')
-        },
-        "Building Docker integration tests image":
-        {
-            app_int_image = docker.build("nodejs-demo-int-tests:${imagetag}",'src/demo-app-int-tests')
-        },
-        failFast: false
+        buildImages()
        
+       // Run demo app
         app_container = app_image.run("-i --name nodejs-demo-${imagetag}")
    
         stage 'unit tests'
         unit_container_id = runAttached(app_unit_image, "-i --name nodejs-demo-unit-tests-${imagetag}")
-        docker.script.sh "docker logs ${unit_container_id} > result.txt 2>&1"
-        def unit_results = readFile('result.txt')
-        if (unit_results.trim().contains('npm info ok'))
-        {
-            echo 'Unit tests passed.'
-        }
-        else
-        {
-            error 'Unit tests stage failed'
-        }
-   
+        testResults(unit_container_id, 'Unit')
+
         stage 'integration tests'
         int_container_id = runAttached(app_int_image, "-i --link nodejs-demo-${imagetag}:demohost --name nodejs-demo-int-tests-${imagetag}")
-        docker.script.sh "docker logs ${int_container_id} > result.txt 2>&1"
-        def int_results = readFile('result.txt')
-        if (int_results.trim().contains('npm info ok'))
-        {
-            echo 'Integration tests passed.'
-        }
-        else
-        {
-            error 'Integration tests stage failed'
-        }
+        testResults(int_container_id, 'Integration')
       }
       catch (all)
       {
@@ -60,39 +32,26 @@ node {
       }
       finally
       {
-        parallel "Stop demo app container":
-        {
-         try
-         {
-            app_container.stop()
-         }
-         catch (all)
-         {    
-         }
-        },
-        "Stop unit tests container":
-        {
-         try
-         {
-            docker.script.sh "docker stop ${unit_container_id} && docker rm -f ${unit_container_id}"
-         }
-         catch (all)
-         {
-         }
-        },
-        "Stop integration tests container":
-        {
-         try
-         {
-            docker.script.sh "docker stop ${int_container_id} && docker rm -f ${int_container_id}"
-         }
-         catch (all)
-         {
-         }
-        },
-        failFast: false
+         cleanup()
       }    
    }
+}
+
+def buildImages() {
+
+  parallel "Building Docker demo app image":
+  {
+      app_image = docker.build("nodejs-demo:${imagetag}",'src/demo-app')
+  },
+  "Building Docker unit tests image":
+  {
+      app_unit_image = docker.build("nodejs-demo-unit-tests:${imagetag}",'src/demo-app-unit-tests')
+  },
+  "Building Docker integration tests image":
+  {
+      app_int_image = docker.build("nodejs-demo-int-tests:${imagetag}",'src/demo-app-int-tests')
+  },
+  failFast: false
 }
 
 def runAttached(image, args) {
@@ -111,3 +70,52 @@ def runAttached(image, args) {
    }
 }
 
+def testResults(container, stage) {
+
+  docker.script.sh "docker logs ${container} > result.txt 2>&1"
+  def result = readFile('result.txt')
+  if (result.trim().contains('npm info ok'))
+  {
+      echo "${stage} tests passed."
+  
+  else
+  {
+      error "${stage} tests failed"
+  }
+}
+
+def cleanup() {
+
+  parallel "Stop demo app container":
+  {
+   try
+   {
+      app_container.stop()
+   }
+   catch (all)
+   {    
+   }
+  },
+  "Stop unit tests container":
+  {
+   try
+   {
+      docker.script.sh "docker stop ${unit_container_id} && docker rm -f ${unit_container_id}"
+   }
+   catch (all)
+   {
+   }
+  },
+  "Stop integration tests container":
+  {
+   try
+   {
+      docker.script.sh "docker stop ${int_container_id} && docker rm -f ${int_container_id}"
+   }
+   catch (all)
+   {
+   }
+  },
+  failFast: false
+
+}
