@@ -134,7 +134,7 @@ def pushImage(image) {
    echo 'pushing to vdr..'
    docker.script.sh "docker push ose3master1.services.slogvpc4.caplatformdev.com:5000/platform/${image}"
    }
-   catch {
+   catch (all) {
       echo 'crap!'
    }
 
