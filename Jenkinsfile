@@ -77,7 +77,7 @@ def testResults(container, stage) {
   if (result.trim().contains('npm info ok'))
   {
       echo "${stage} tests passed."
-  
+  }
   else
   {
       error "${stage} tests failed"
