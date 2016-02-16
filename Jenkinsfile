@@ -41,9 +41,10 @@ node {
 
 def buildImages(imagetag) {
 
-   // Build demo app image first (used as test image base)
+   // Build demo app image first (latest used as test image base)
    app_image = docker.build("nodejs-demo",'src/demo-app')
-   
+   app_image.tag("${imagetag}");
+ 
    parallel "Building Docker unit tests image":
    {
       app_unit_image = docker.build("nodejs-demo-unit-tests:${imagetag}",'src/demo-app-unit-tests')
@@ -54,9 +55,6 @@ def buildImages(imagetag) {
    },
    failFast: false
   
-   // Now tag demo app image (after test images built on 'latest' base)
-   app_image.tag("${imagetag}");
-
    echo 'Docker builds for images successful'
    
    return [app_image, app_unit_image, app_int_image]
