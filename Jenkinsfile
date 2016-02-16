@@ -28,6 +28,11 @@ node {
         stage 'integration tests'
         int_container_id = runAttached(app_int_image, "-i --link nodejs-demo-${imagetag}:demohost --name nodejs-demo-int-tests-${imagetag}")
         testResults(int_container_id, 'Integration')
+        
+        stage 'push images'
+        pushImage("nodejs-demo-${imagetag}")
+        pushImage("nodejs-demo-unit-tests-${imagetag}")
+        pushImage("nodejs-demo-int-tests-${imagetag}")
       }
       catch (all)
       {
@@ -120,3 +125,10 @@ def cleanup(app_container, unit_container_id, int_container_id) {
   failFast: false
 
 }
+
+def pushImage(image) {
+
+   docker.script.sh "docker tag ${image} ose3vdr1:5000/platform/${image}"
+   docker.script.sh "docker push ose3vdr1:5000/platform/${image}"
+}
+
