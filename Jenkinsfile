@@ -15,7 +15,7 @@ node {
         stage 'build'
         buildImages(imagetag)
        
-       // Run demo app
+        // Run demo app
         app_container = app_image.run("-i --name nodejs-demo-${imagetag}")
    
         stage 'unit tests'
