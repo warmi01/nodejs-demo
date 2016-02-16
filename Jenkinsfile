@@ -30,9 +30,9 @@ node {
         testResults(int_container_id, 'Integration')
         
         stage 'push images'
-        pushImage("nodejs-demo-${imagetag}")
-        pushImage("nodejs-demo-unit-tests-${imagetag}")
-        pushImage("nodejs-demo-int-tests-${imagetag}")
+        pushImage("nodejs-demo:${imagetag}")
+        pushImage("nodejs-demo-unit-tests:${imagetag}")
+        pushImage("nodejs-demo-int-tests:${imagetag}")
       }
       catch (all)
       {
