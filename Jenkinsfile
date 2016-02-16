@@ -4,6 +4,8 @@ node {
 
    docker.withRegistry('https://docker.example.com/', 'docker-registry-login') {
    
+      def app_image, app_unit_image, app_int_image, app_container, unit_container_id, int_container_id
+
       try
       {
         def version = readFile 'src/version.txt' 
@@ -12,22 +14,22 @@ node {
         stage 'build'
         parallel "Building Docker demo app image":
         {
-            def app_image = docker.build("nodejs-demo:${imagetag}",'src/demo-app')
+            app_image = docker.build("nodejs-demo:${imagetag}",'src/demo-app')
         },
         "Building Docker unit tests image":
         {
-               app_unit_image = docker.build("nodejs-demo-unit-tests:${imagetag}",'src/demo-app-unit-tests')
+            app_unit_image = docker.build("nodejs-demo-unit-tests:${imagetag}",'src/demo-app-unit-tests')
         },
         "Building Docker integration tests image":
         {
-         app_int_image = docker.build("nodejs-demo-int-tests:${imagetag}",'src/demo-app-int-tests')
+            app_int_image = docker.build("nodejs-demo-int-tests:${imagetag}",'src/demo-app-int-tests')
         },
         failFast: false
        
-        def app_container = app_image.run("-i --name nodejs-demo-${imagetag}")
+        app_container = app_image.run("-i --name nodejs-demo-${imagetag}")
    
         stage 'unit tests'
-        def unit_container_id = runAttached(app_unit_image, "-i --name nodejs-demo-unit-tests-${imagetag}")
+        unit_container_id = runAttached(app_unit_image, "-i --name nodejs-demo-unit-tests-${imagetag}")
         docker.script.sh "docker logs ${unit_container_id} > result.txt 2>&1"
         def unit_results = readFile('result.txt')
         if (unit_results.trim().contains('npm info ok'))
@@ -40,7 +42,7 @@ node {
         }
    
         stage 'integration tests'
-        def int_container_id = runAttached(app_int_image, "-i --link nodejs-demo-${imagetag}:demohost --name nodejs-demo-int-tests-${imagetag}")
+        int_container_id = runAttached(app_int_image, "-i --link nodejs-demo-${imagetag}:demohost --name nodejs-demo-int-tests-${imagetag}")
         docker.script.sh "docker logs ${int_container_id} > result.txt 2>&1"
         def int_results = readFile('result.txt')
         if (int_results.trim().contains('npm info ok'))
