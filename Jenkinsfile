@@ -13,7 +13,7 @@ node {
         def imagetag = "${version.trim()}.${env.BUILD_ID}"
    
         stage 'build'
-        buildImages()
+        buildImages(imagetag)
        
        // Run demo app
         app_container = app_image.run("-i --name nodejs-demo-${imagetag}")
