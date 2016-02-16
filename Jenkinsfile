@@ -129,6 +129,7 @@ def cleanup(app_container, unit_container_id, int_container_id) {
 def pushImage(image) {
 
    try {
+      // temporariy use fully qualified VDR name; shorter ose3vdr1 should be used once devops docker changes made
       docker.script.sh "docker tag ${image} ose3vdr1.services.slogvpc4.caplatformdev.com:5000/platform/${image}"
       docker.script.sh "docker push ose3vdr1.services.slogvpc4.caplatformdev.com:5000/platform/${image}"
    }
