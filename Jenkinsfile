@@ -13,9 +13,9 @@ node {
         def imagetag = "${version.trim()}.${env.BUILD_ID}"
    
         stage 'build'
-        buildImages(imagetag)
+        def images = buildImages(imagetag)
         
-        echo "app_image: ${app_image}"
+        echo "app_image: ${images[0]}"
        
         // Run demo app
         echo 'Running demo app..'
@@ -57,6 +57,8 @@ def buildImages(imagetag) {
    failFast: false
   
    echo 'Docker builds for images successful'
+   
+   return [app_image, app_unit_image, app_int_image]
 }
 
 def runAttached(image, args) {
