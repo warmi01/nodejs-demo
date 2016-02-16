@@ -16,9 +16,9 @@ node {
      app_int_image = docker.build('nodejs-demo-int-tests','src/demo-app-int-tests')
      def int_id = runAttached(app_int_image, "-i --link nodejs-demo-${env.BUILD_ID}:demohost --name nodejs-demo-int-tests-${env.BUILD_ID}")
 
-     app_container.stop()
-     docker.script.sh "docker stop ${unit_id} && docker rm -f ${unit_id}"
-     docker.script.sh "docker stop ${int_id} && docker rm -f ${int_id}"
+     //app_container.stop()
+     //docker.script.sh "docker stop ${unit_id} && docker rm -f ${unit_id}"
+     //docker.script.sh "docker stop ${int_id} && docker rm -f ${int_id}"
      
      def version = readFile 'src/version.txt' 
      def buildtag = "${version.trim()}.${env.BUILD_ID}"
