@@ -5,7 +5,7 @@ node {
 
    checkout scm
 
-   docker.withRegistry('https://docker.example.com/', 'docker-registry-login') {
+   //docker.withRegistry('https://docker.example.com/', 'docker-registry-login') {
    
       try
       {
@@ -34,7 +34,7 @@ node {
       {
          //cleanup()
       }    
-   }
+   //}
 }
 
 def buildImages(imagetag) {
