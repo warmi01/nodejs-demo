@@ -128,7 +128,7 @@ def cleanup(app_container, unit_container_id, int_container_id) {
 
 def pushImage(image) {
 
-   docker.script.sh "docker tag ${image} ose3vdr1:5000/platform/${image}"
-   docker.script.sh "docker push ose3vdr1:5000/platform/${image}"
+   docker.script.sh "docker tag ${image} ose3master1.services.slogvpc4.caplatformdev.com:5000/platform/${image}"
+   docker.script.sh "docker push ose3master1.services.slogvpc4.caplatformdev.com:5000/platform/${image}"
 }
 
