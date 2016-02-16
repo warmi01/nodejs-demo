@@ -14,6 +14,8 @@ node {
    
         stage 'build'
         buildImages(imagetag)
+        
+        echo "app_image: ${app_image}"
        
         // Run demo app
         echo 'Running demo app..'
