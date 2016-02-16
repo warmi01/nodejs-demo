@@ -39,11 +39,11 @@ node {
 
 def buildImages() {
 
-  parallel "Building Docker demo app image":
-  {
-      app_image = docker.build("nodejs-demo:${imagetag}",'src/demo-app')
-  },
-  "Building Docker unit tests image":
+  // Build demo app image first (used as test image base)
+  docker.build("nodejs-demo",'src/demo-app')
+  app_image = docker.build("nodejs-demo:${imagetag}",'src/demo-app')
+  
+  parallel "Building Docker unit tests image":
   {
       app_unit_image = docker.build("nodejs-demo-unit-tests:${imagetag}",'src/demo-app-unit-tests')
   },
