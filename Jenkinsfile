@@ -1,5 +1,7 @@
 node {
 
+   def app_image, app_unit_image, app_int_image, app_container, unit_container_id, int_container_id
+
    checkout scm
 
    //docker.withRegistry('https://docker.example.com/', 'docker-registry-login') {
@@ -8,8 +10,7 @@ node {
       {
         def version = readFile 'src/version.txt' 
         def imagetag = "${version.trim()}.${env.BUILD_ID}"
-        def app_image, app_unit_image, app_int_image, app_container, unit_container_id, int_container_id
-   
+
         stage 'build'
         def images = buildImages(imagetag)
         app_image = images[0]
