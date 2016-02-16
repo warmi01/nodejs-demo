@@ -34,7 +34,7 @@ node {
       }
       finally
       {
-         //cleanup()
+         cleanup()
       }    
    //}
 }
