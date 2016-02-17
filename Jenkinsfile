@@ -85,8 +85,8 @@ def runAttached(image, args) {
 def testResults(container, stage) {
 
   docker.script.sh "docker logs ${container} > result.txt 2>&1"
-  def result = readFile('result.txt')
-  if ((result.trim()).substring(result.length()-11, result.length()) == 'npm info ok')
+  def result = readFile('result.txt').trim()
+  if (result.substring(result.length()-11, result.length()) == 'npm info ok')
   {
       echo "${stage} tests passed."
   }
