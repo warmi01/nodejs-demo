@@ -89,8 +89,7 @@ def testResults(container, stage) {
   echo "results: .."
   def substr = result.trim()
   echo "results: ${substr}"
-  substr = substr.substring(20)
- 
+  substr = substr.substring(substr.length()-11, substr.length())
   echo "results tail: ${substr}"
   if (substr == 'npm info ok')
   {
