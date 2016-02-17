@@ -87,13 +87,14 @@ def testResults(container, stage) {
   docker.script.sh "docker logs ${container} > result.txt 2>&1"
   def result = readFile('result.txt')
   result = result.trim()
-  if (result.substring(result.length()-11, result.length()) == 'npm info ok')
+  if (result.substring(result.length()-12, result.length()) == 'npm info ok')
   {
       echo "${stage} tests passed."
   }
   else
   {
-      error "${stage} tests failed"
+      echo "${stage} tests failed."
+      error "${stage} tests failed."
   }
 }
 
