@@ -94,7 +94,7 @@ def testResults(container, stage) {
   else
   {
       echo "${stage} tests failed."
-      error "${stage} tests failed."
+      error '${stage} tests failed.'
   }
 }
 
