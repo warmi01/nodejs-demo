@@ -86,7 +86,8 @@ def testResults(container, stage) {
 
   docker.script.sh "docker logs ${container} > result.txt 2>&1"
   def result = readFile('result.txt')
-  echo "results tail: ${(result.trim()).substring(result.length()-11)}"
+  echo "results: ${result.trim()}"
+  echo "results tail: ${result.trim().substring(result.length()-11)}"
   if ((result.trim()).substring(result.length()-11) == 'npm info ok')
   {
       echo "${stage} tests passed."
