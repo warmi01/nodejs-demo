@@ -4,7 +4,7 @@ node {
 
    checkout scm
 
-   //docker.withRegistry('https://docker.example.com/', 'docker-registry-login') {
+   docker.withServer(env.CI_DOCKER_HOST) {
    
       try
       {
@@ -42,7 +42,7 @@ node {
       {
          cleanup(app_container, unit_container_id, int_container_id)
       }    
-   //}
+   }
 }
 
 def buildImages(imagetag) {
