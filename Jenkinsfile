@@ -125,5 +125,3 @@ def publishDockerImages(images, imagetag) {
    catch (all) {error "Failed to tag/push to VDR image"}
 }
 
-}
-
