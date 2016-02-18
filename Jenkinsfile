@@ -29,10 +29,8 @@ node {
         int_container_id = runAttached(app_int_image, "-i --link nodejs-demo-${imagetag}:demohost --name nodejs-demo-int-tests-${imagetag}")
         testResults(int_container_id, 'Integration')
         
-        stage 'push images'
-        pushImage("nodejs-demo:${imagetag}")
-        pushImage("nodejs-demo-unit-tests:${imagetag}")
-        pushImage("nodejs-demo-int-tests:${imagetag}")
+        stage 'publish docker images'
+        publishDockerImages(imagetag)
       }
       catch (all)
       {
@@ -124,5 +122,11 @@ def pushImage(image) {
       docker.script.sh "docker push ose3vdr1.services.slogvpc4.caplatformdev.com:5000/platform/${image}"
    }
    catch (all) {error "Failed to tag/push to VDR image ${image}"}
+}
+
+def publishDockerImages(imagetag) {
+     pushImage("nodejs-demo:${imagetag}")
+     pushImage("nodejs-demo-unit-tests:${imagetag}")
+     pushImage("nodejs-demo-int-tests:${imagetag}")
 }
 
