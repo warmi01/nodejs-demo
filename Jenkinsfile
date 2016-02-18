@@ -73,8 +73,7 @@ def runAttached(image, args) {
       try {
         docker.script.sh "rm .container"
       }
-      catch (all) 
-      {} 
+      catch (all) {} 
       docker.script.sh "docker run --cidfile=.container ${args != '' ? ' ' + args : ''} ${image.id}"
       def container = docker.script.readFile('.container').trim()
       docker.script.dockerFingerprintRun containerId: container, toolName: docker.script.env.DOCKER_TOOL_NAME
@@ -101,30 +100,20 @@ def cleanup(app_container, unit_container_id, int_container_id) {
 
   parallel "Stop demo app container":
   {
-   try
-   {
-      app_container.stop()
-   }
+   try {app_container.stop()}
    catch (all) {echo 'Error stopping demo app container'}
   },
   "Stop unit tests container":
   {
-   try
-   {
-      docker.script.sh "docker stop ${unit_container_id} && docker rm -f ${unit_container_id}"
-   }
+   try {docker.script.sh "docker stop ${unit_container_id} && docker rm -f ${unit_container_id}"}
    catch (all) {echo 'Error stopping unit tests container'}
   },
   "Stop integration tests container":
   {
-   try
-   {
-      docker.script.sh "docker stop ${int_container_id} && docker rm -f ${int_container_id}"
-   }
+   try {docker.script.sh "docker stop ${int_container_id} && docker rm -f ${int_container_id}"}
    catch (all) {echo 'Error stopping integration tests container'}
   },
   failFast: false
-
 }
 
 def pushImage(image) {
@@ -134,8 +123,6 @@ def pushImage(image) {
       docker.script.sh "docker tag ${image} ose3vdr1.services.slogvpc4.caplatformdev.com:5000/platform/${image}"
       docker.script.sh "docker push ose3vdr1.services.slogvpc4.caplatformdev.com:5000/platform/${image}"
    }
-   catch (all) {
-       error "Failed to tag/push to VDR image ${image}"
-   }
+   catch (all) {error "Failed to tag/push to VDR image ${image}"}
 }
 
