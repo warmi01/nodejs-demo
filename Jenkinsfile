@@ -10,7 +10,7 @@ node {
       {
         def version = readFile 'src/version.txt' 
         def imagetag = "${version.trim()}.${env.BUILD_ID}"
-        def images = {app: null, app_unit: null, app_int: null}
+        def images = ['app': null, 'app_unit': null, 'app_int': null]
 
         stage 'build docker images'
         buildImages(images, imagetag)
