@@ -10,27 +10,25 @@ node {
       {
         def version = readFile 'src/version.txt' 
         def imagetag = "${version.trim()}.${env.BUILD_ID}"
+        def images = {app: null, app_unit: null, app_int: null}
 
         stage 'build docker images'
-        def images = buildImages(imagetag)
-        app_image = images[0]
-        app_unit_image = images[1]
-        app_int_image = images[2]
-        
+        buildImages(images, imagetag)
+
         // Run demo app
         echo 'Running demo app..'
-        app_container = app_image.run("-i --name nodejs-demo-${imagetag}")
+        app_container = images.app.run("-i --name nodejs-demo-${imagetag}")
    
         stage 'run unit tests'
-        unit_container_id = runAttached(app_unit_image, "-i --name nodejs-demo-unit-tests-${imagetag}")
+        unit_container_id = runAttached(images.app_unit, "-i --name nodejs-demo-unit-tests-${imagetag}")
         testResults(unit_container_id, 'Unit')
 
         stage 'run integration tests'
-        int_container_id = runAttached(app_int_image, "-i --link nodejs-demo-${imagetag}:demohost --name nodejs-demo-int-tests-${imagetag}")
+        int_container_id = runAttached(images.app_int, "-i --link nodejs-demo-${imagetag}:demohost --name nodejs-demo-int-tests-${imagetag}")
         testResults(int_container_id, 'Integration')
         
         stage 'publish docker images'
-        publishDockerImages(imagetag)
+        publishDockerImages(images, imagetag)
       }
       catch (all)
       {
@@ -43,25 +41,23 @@ node {
    }
 }
 
-def buildImages(imagetag) {
+def buildImages(images, imagetag) {
 
    // Build demo app image first (latest used as test image base)
-   app_image = docker.build("nodejs-demo",'src/demo-app')
-   app_image.tag("${imagetag}");
+   images.app = docker.build("nodejs-demo",'src/demo-app')
+   images.app.tag("${imagetag}");
  
    parallel "Building Docker unit tests image":
    {
-      app_unit_image = docker.build("nodejs-demo-unit-tests:${imagetag}",'src/demo-app-unit-tests')
+      images.app_unit = docker.build("nodejs-demo-unit-tests:${imagetag}",'src/demo-app-unit-tests')
    },
    "Building Docker integration tests image":
    {
-      app_int_image = docker.build("nodejs-demo-int-tests:${imagetag}",'src/demo-app-int-tests')
+      images.app_int = docker.build("nodejs-demo-int-tests:${imagetag}",'src/demo-app-int-tests')
    },
    failFast: false
   
    echo 'Docker builds for images successful'
-   
-   return [app_image, app_unit_image, app_int_image]
 }
 
 def runAttached(image, args) {
@@ -72,9 +68,11 @@ def runAttached(image, args) {
         docker.script.sh "rm .container"
       }
       catch (all) {} 
+      
       docker.script.sh "docker run --cidfile=.container ${args != '' ? ' ' + args : ''} ${image.id}"
       def container = docker.script.readFile('.container').trim()
       docker.script.dockerFingerprintRun containerId: container, toolName: docker.script.env.DOCKER_TOOL_NAME
+      
       return container
    }
 }
@@ -114,19 +112,18 @@ def cleanup(app_container, unit_container_id, int_container_id) {
   failFast: false
 }
 
-def pushImage(image) {
+def publishDockerImages(images, imagetag) {
 
    try {
       // temporariy use fully qualified VDR name; shorter ose3vdr1 should be used once devops docker changes made
-      docker.script.sh "docker tag ${image} ose3vdr1.services.slogvpc4.caplatformdev.com:5000/platform/${image}"
-      docker.script.sh "docker push ose3vdr1.services.slogvpc4.caplatformdev.com:5000/platform/${image}"
+      docker.withRegistry('ose3vdr1.services.slogvpc4.caplatformdev.com:5000', 'docker-registry-login') {
+         for (var image in images) {
+            images[image].push(imagetag)
+         }
+      }
    }
-   catch (all) {error "Failed to tag/push to VDR image ${image}"}
+   catch (all) {error "Failed to tag/push to VDR image"}
 }
 
-def publishDockerImages(imagetag) {
-     pushImage("nodejs-demo:${imagetag}")
-     pushImage("nodejs-demo-unit-tests:${imagetag}")
-     pushImage("nodejs-demo-int-tests:${imagetag}")
 }
 
