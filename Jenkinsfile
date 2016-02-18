@@ -117,8 +117,8 @@ def publishDockerImages(images, imagetag) {
    try {
       // temporariy use fully qualified VDR name; shorter ose3vdr1 should be used once devops docker changes made
       docker.withRegistry('ose3vdr1.services.slogvpc4.caplatformdev.com:5000', 'docker-registry-login') {
-         for (var image in images) {
-            images[image].push(imagetag)
+         images.each {
+            it.value.push(imagetag)
          }
       }
    }
