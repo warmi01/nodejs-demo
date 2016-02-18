@@ -11,7 +11,7 @@ node {
         def version = readFile 'src/version.txt' 
         def imagetag = "${version.trim()}.${env.BUILD_ID}"
 
-        stage 'build'
+        stage 'build docker images'
         def images = buildImages(imagetag)
         app_image = images[0]
         app_unit_image = images[1]
@@ -21,11 +21,11 @@ node {
         echo 'Running demo app..'
         app_container = app_image.run("-i --name nodejs-demo-${imagetag}")
    
-        stage 'unit tests'
+        stage 'run unit tests'
         unit_container_id = runAttached(app_unit_image, "-i --name nodejs-demo-unit-tests-${imagetag}")
         testResults(unit_container_id, 'Unit')
 
-        stage 'integration tests'
+        stage 'run integration tests'
         int_container_id = runAttached(app_int_image, "-i --link nodejs-demo-${imagetag}:demohost --name nodejs-demo-int-tests-${imagetag}")
         testResults(int_container_id, 'Integration')
         
