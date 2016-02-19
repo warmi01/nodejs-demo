@@ -119,15 +119,17 @@ def publishDockerImages(images, imagetag) {
       echo 'here I go'
       docker.withRegistry('http://ose3vdr1.services.slogvpc4.caplatformdev.com:5000', 'docker-registry-login') {
          echo 'in registry block'
+         def values = images.values()
+         echo "${values}"
          images.each {
-         echo 'got it'
-         echo "got it: ${it.key}"
-         def name = it.value.imageName()
-         echo "pushing ${name}"
+            echo 'got it'
+            echo "got it: ${it.key}"
+            def name = it.value.imageName()
+            echo "pushing ${name}"
             it.value.push(imagetag)
          }
       }
    }
-   catch (all) {error "Failed to tag/push to VDR image"}
+   catch (all) {echo "Failed to tag/push to VDR image"}
 }
 
