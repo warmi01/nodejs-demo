@@ -44,12 +44,8 @@ def buildImages(images, imagetag) {
      images.app.tag("${imagetag}")
      images.app = docker.image("${env.JOB_NAME}:${imagetag}")
      
-     parallel "Building Docker tests image":
-     {
-          images.app_tests = docker.build("${env.JOB_NAME}-tests:${imagetag}",'src/demo-app-tests')
-     },
-     failFast: false
-     
+     images.app_tests = docker.build("${env.JOB_NAME}-tests:${imagetag}",'src/demo-app-tests')
+
      echo 'Docker builds for images successful'
 }
 
