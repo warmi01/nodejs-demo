@@ -70,7 +70,7 @@ def runAttached(image, args) {
      }
 }
 
-def testResults(container, stage) {
+def testResults(container) {
 
      docker.script.sh "docker logs ${container} > result.txt 2>&1"
      def result = docker.script.readFile('result.txt').trim()
