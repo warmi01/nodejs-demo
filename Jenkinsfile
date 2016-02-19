@@ -129,7 +129,7 @@ def publishDockerImages(images, imagetag) {
                
                images.app.push(imagetag)
                images.app_unit.push(imagetag)
-               images.app_int(imagetag)
+               images.app_int.push(imagetag)
           }
      }
      catch (all) {
