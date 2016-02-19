@@ -36,7 +36,7 @@ node {
       }
       finally
       {
-         cleanup(app_container, unit_container_id, int_container_id)
+         cleanup(images, app_container, unit_container_id, int_container_id)
       }    
    }
 }
@@ -96,17 +96,26 @@ def cleanup(app_container, unit_container_id, int_container_id) {
 
   parallel "Stop demo app container":
   {
-   try {app_container.stop()}
+   try {
+      app_container.stop()
+      docker.script.sh "docker rmi ${images.app.id}"
+   }
    catch (all) {echo 'Error stopping demo app container'}
   },
   "Stop unit tests container":
   {
-   try {docker.script.sh "docker stop ${unit_container_id} && docker rm -f ${unit_container_id}"}
+   try {
+      docker.script.sh "docker stop ${unit_container_id} && docker rm -f ${unit_container_id}"
+      docker.script.sh "docker rmi ${images.app_unit.id}"
+   }
    catch (all) {echo 'Error stopping unit tests container'}
   },
   "Stop integration tests container":
   {
-   try {docker.script.sh "docker stop ${int_container_id} && docker rm -f ${int_container_id}"}
+   try {
+      docker.script.sh "docker stop ${int_container_id} && docker rm -f ${int_container_id}"
+      docker.script.sh "docker rmi ${images.app_int.id}"
+   }
    catch (all) {echo 'Error stopping integration tests container'}
   },
   failFast: false
@@ -116,13 +125,14 @@ def publishDockerImages(images, imagetag) {
 
    try {
       // temporariy use fully qualified VDR name; shorter ose3vdr1 should be used once devops docker changes made
-       docker.withRegistry('http://ose3vdr1.services.slogvpc4.caplatformdev.com:5000', 'docker-registry-login') {
-            images.app.push(imagetag)
-            images.app_unit.push(imagetag)
-            images.app_int(imagetag)
-         }
+      docker.withRegistry('http://ose3vdr1.services.slogvpc4.caplatformdev.com:5000', 'docker-registry-login') {
+         images.app.push(imagetag)
+         images.app_unit.push(imagetag)
+         images.app_int(imagetag)
       }
    }
-   catch (all) {echo "Failed to tag/push to VDR image"}
+   catch (all) {
+      error 'Failed to tag/push to VDR image'
+   }
 }
 
