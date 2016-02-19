@@ -116,8 +116,12 @@ def publishDockerImages(images, imagetag) {
 
    try {
       // temporariy use fully qualified VDR name; shorter ose3vdr1 should be used once devops docker changes made
+      echo 'here I go'
       docker.withRegistry('ose3vdr1.services.slogvpc4.caplatformdev.com:5000', 'docker-registry-login') {
+         echo 'in registry block'
          images.each {
+         echo 'got it'
+         echo "got it: ${it.key}"
          def name = it.value.imageName()
          echo "pushing ${name}"
             it.value.push(imagetag)
