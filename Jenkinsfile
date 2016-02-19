@@ -1,7 +1,7 @@
 node {
 
-     def images = ['app': null, 'app_unit': null, 'app_int': null]
-     def containers = ['app': null, 'app_unit': null, 'app_int': null]
+     def images = ['app': null, 'app_tests': null]
+     def containers = ['app': null, 'app_tests': null]
 
      checkout scm
      
@@ -17,15 +17,11 @@ node {
                
                // Run demo app
                echo 'Running demo app..'
-               containers.app = images.app.run("-i --name nodejs-demo-${imagetag}")
-               
-               stage 'run unit tests'
-               containers.app_unit = runAttached(images.app_unit, "-i --name nodejs-demo-unit-tests-${imagetag}")
-               testResults(containers.app_unit, 'Unit')
+               containers.app = images.app.run("-i --name ${env.JOB_NAME}-${imagetag}")
                
                stage 'run integration tests'
-               containers.app_int = runAttached(images.app_int, "-i --link nodejs-demo-${imagetag}:demohost --name nodejs-demo-int-tests-${imagetag}")
-               testResults(containers.app_int, 'Integration')
+               containers.app_tests = runAttached(images.app_tests, "-i --link ${env.JOB_NAME}-${imagetag}:demohost --name ${env.JOB_NAME}-tests-${imagetag}")
+               testResults(containers.app_tests)
                
                stage 'publish docker images'
                publishDockerImages(images, imagetag)
@@ -44,17 +40,13 @@ node {
 def buildImages(images, imagetag) {
 
      // Build demo app image first (latest used as test image base)
-     images.app = docker.build("nodejs-demo",'src/demo-app')
+     images.app = docker.build("${env.JOB_NAME}",'src/demo-app')
      images.app.tag("${imagetag}")
-     images.app = docker.image("nodejs-demo:${imagetag}")
+     images.app = docker.image("${env.JOB_NAME}:${imagetag}")
      
-     parallel "Building Docker unit tests image":
+     parallel "Building Docker tests image":
      {
-          images.app_unit = docker.build("nodejs-demo-unit-tests:${imagetag}",'src/demo-app-unit-tests')
-     },
-     "Building Docker integration tests image":
-     {
-          images.app_int = docker.build("nodejs-demo-int-tests:${imagetag}",'src/demo-app-int-tests')
+          images.app_tests = docker.build("${env.JOB_NAME}-tests:${imagetag}",'src/demo-app-int-tests')
      },
      failFast: false
      
@@ -85,11 +77,11 @@ def testResults(container, stage) {
 
      if (result.contains('npm info ok'))
      {
-          echo "${stage} tests passed"
+          echo "Integration tests passed"
      }
      else
      {
-          error "${stage} tests failed"
+          error "Integration tests failed"
      }
 }
 
@@ -103,21 +95,13 @@ def cleanup(images, containers) {
           }
           catch (all) {echo 'Error stopping demo app container'}
      },
-     "Stop unit tests container":
+     "Stop tests container":
      {
           try {
-               docker.script.sh "docker stop ${containers.app_unit} && docker rm -f ${containers.app_unit}"
-               docker.script.sh "docker rmi ${images.app_unit.id}"
+               docker.script.sh "docker stop ${containers.app_tests} && docker rm -f ${containers.app_tests}"
+               docker.script.sh "docker rmi ${images.app_tests.id}"
           }
-          catch (all) {echo 'Error stopping unit tests container'}
-     },
-     "Stop integration tests container":
-     {
-          try {
-               docker.script.sh "docker stop ${containers.app_int} && docker rm -f ${containers.app_int}"
-               docker.script.sh "docker rmi ${images.app_int.id}"
-          }
-          catch (all) {echo 'Error stopping integration tests container'}
+          catch (all) {echo 'Error stopping tests container'}
      },
      failFast: false
 }
@@ -129,8 +113,7 @@ def publishDockerImages(images, imagetag) {
           docker.withRegistry('http://ose3vdr1.services.slogvpc4.caplatformdev.com:5000', 'docker-registry-login') {
                
                images.app.push(imagetag)
-               images.app_unit.push(imagetag)
-               images.app_int.push(imagetag)
+               images.app_tests.push(imagetag)
           }
      }
      catch (all) {
