@@ -44,8 +44,8 @@ node {
 def buildImages(images, imagetag) {
 
      // Build demo app image first (latest used as test image base)
-     images.app = docker.build("nodejs-demo"),'src/demo-app')
-     images.app.tag("${imagetag}");
+     images.app = docker.build("nodejs-demo",'src/demo-app')
+     images.app.tag("${imagetag}")
      images.app = docker.image("nodejs-demo:${imagetag}")
      
      parallel "Building Docker unit tests image":
