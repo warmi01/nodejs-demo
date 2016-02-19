@@ -1,6 +1,7 @@
 node {
 
-   def app_image, app_unit_image, app_int_image, app_container, unit_container_id, int_container_id
+     def images = ['app': null, 'app_unit': null, 'app_int': null]
+     def containers = ['app': null, 'app_unit': null, 'app_int': null]
 
    checkout scm
 
@@ -10,22 +11,21 @@ node {
       {
         def version = readFile 'src/version.txt' 
         def imagetag = "${version.trim()}.${env.BUILD_ID}"
-        def images = ['app': null, 'app_unit': null, 'app_int': null]
 
         stage 'build docker images'
         buildImages(images, imagetag)
 
         // Run demo app
         echo 'Running demo app..'
-        app_container = images.app.run("-i --name nodejs-demo-${imagetag}")
+        containers.app = images.app.run("-i --name nodejs-demo-${imagetag}")
    
         stage 'run unit tests'
-        unit_container_id = runAttached(images.app_unit, "-i --name nodejs-demo-unit-tests-${imagetag}")
-        testResults(unit_container_id, 'Unit')
+        containers.app_unit = runAttached(images.app_unit, "-i --name nodejs-demo-unit-tests-${imagetag}")
+        testResults(containers.app_unit, 'Unit')
 
         stage 'run integration tests'
-        int_container_id = runAttached(images.app_int, "-i --link nodejs-demo-${imagetag}:demohost --name nodejs-demo-int-tests-${imagetag}")
-        testResults(int_container_id, 'Integration')
+        containers.app_int = runAttached(images.app_int, "-i --link nodejs-demo-${imagetag}:demohost --name nodejs-demo-int-tests-${imagetag}")
+        testResults(containers.app_int, 'Integration')
         
         stage 'publish docker images'
         publishDockerImages(images, imagetag)
@@ -36,7 +36,7 @@ node {
       }
       finally
       {
-         cleanup(images, app_container, unit_container_id, int_container_id)
+         cleanup(images, containers)
       }    
    }
 }
@@ -92,12 +92,12 @@ def testResults(container, stage) {
   }
 }
 
-def cleanup(app_container, unit_container_id, int_container_id) {
+def cleanup(images, containers) {
 
   parallel "Stop demo app container":
   {
    try {
-      app_container.stop()
+      containers.app.stop()
       docker.script.sh "docker rmi ${images.app.id}"
    }
    catch (all) {echo 'Error stopping demo app container'}
@@ -105,7 +105,7 @@ def cleanup(app_container, unit_container_id, int_container_id) {
   "Stop unit tests container":
   {
    try {
-      docker.script.sh "docker stop ${unit_container_id} && docker rm -f ${unit_container_id}"
+      docker.script.sh "docker stop ${containers.app_unit} && docker rm -f ${containers.app_unit}"
       docker.script.sh "docker rmi ${images.app_unit.id}"
    }
    catch (all) {echo 'Error stopping unit tests container'}
@@ -113,7 +113,7 @@ def cleanup(app_container, unit_container_id, int_container_id) {
   "Stop integration tests container":
   {
    try {
-      docker.script.sh "docker stop ${int_container_id} && docker rm -f ${int_container_id}"
+      docker.script.sh "docker stop ${containers.app_int} && docker rm -f ${containers.app_int}"
       docker.script.sh "docker rmi ${images.app_int.id}"
    }
    catch (all) {echo 'Error stopping integration tests container'}
