@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test" : "mocha --require test/support/env --reporter spec --bail --check-leaks test/ test/"
+    "test" : "mocha --require test/support/env --reporter spec --bail --check-leaks test/ test/",
+    "int-test" : "mocha --require test/support/env --reporter spec --bail --check-leaks int-test/ int-test/"
   },
   "dependencies": {
     "body-parser": "~1.13.2",
