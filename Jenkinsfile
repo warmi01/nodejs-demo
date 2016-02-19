@@ -20,7 +20,7 @@ node {
                containers.app = images.app.run("-i --name ${env.JOB_NAME}-${imagetag}")
                
                stage 'run integration tests'
-               containers.app_tests = runAttached(images.app_tests, "-i --link ${env.JOB_NAME}-${imagetag}:demohost --name ${env.JOB_NAME}-tests-${imagetag}")
+               containers.app_tests = runAttached(images.app_tests, "-i --link ${env.JOB_NAME}-${imagetag}:demohost --name ${env.JOB_NAME}-tests-${imagetag} npm run-script int-tests")
                testResults(containers.app_tests)
                
                stage 'publish docker images'
@@ -46,7 +46,7 @@ def buildImages(images, imagetag) {
      
      parallel "Building Docker tests image":
      {
-          images.app_tests = docker.build("${env.JOB_NAME}-tests:${imagetag}",'src/demo-app-int-tests')
+          images.app_tests = docker.build("${env.JOB_NAME}-tests:${imagetag}",'src/demo-app-tests')
      },
      failFast: false
      
