@@ -20,7 +20,7 @@ node {
                containers.app = images.app.run("-i --name ${env.JOB_NAME}-${imagetag}")
                
                stage 'run integration tests'
-               containers.app_tests = runAttached(images.app_tests, "-i --link ${env.JOB_NAME}-${imagetag}:demohost --name ${env.JOB_NAME}-tests-${imagetag} 'npm run-script int-test'")
+               containers.app_tests = runAttached(images.app_tests, "-i --link ${env.JOB_NAME}-${imagetag}:demohost --name ${env.JOB_NAME}-tests-${imagetag}", 'npm run-script int-test')
                testResults(containers.app_tests)
                
                stage 'publish docker images'
@@ -53,7 +53,7 @@ def buildImages(images, imagetag) {
      echo 'Docker builds for images successful'
 }
 
-def runAttached(image, args) {
+def runAttached(image, args, command) {
 
      docker.node {
      
@@ -62,7 +62,7 @@ def runAttached(image, args) {
           }
           catch (all) {} 
           
-          docker.script.sh "docker run --cidfile=.container ${args != '' ? ' ' + args : ''} ${image.id}"
+          docker.script.sh "docker run --cidfile=.container ${args != '' ? args : ''} ${image.id} ${command != '' ? command : ''}"
           def container = docker.script.readFile('.container').trim()
           docker.script.dockerFingerprintRun containerId: container, toolName: docker.script.env.DOCKER_TOOL_NAME
           
