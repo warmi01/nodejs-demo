@@ -9,8 +9,8 @@ node {
    
           try
           {
-               def version = readFile 'src/version.txt' 
-               def imagetag = "${version.trim()}.${env.BUILD_ID}"
+               def version = docker.script.readFile('src/version.txt').trim() 
+               def imagetag = "${version}.${env.BUILD_ID}"
                
                stage 'build docker images'
                buildImages(images, imagetag)
@@ -44,8 +44,9 @@ node {
 def buildImages(images, imagetag) {
 
      // Build demo app image first (latest used as test image base)
-     images.app = docker.build("nodejs-demo",'src/demo-app')
+     images.app = docker.build("nodejs-demo"),'src/demo-app')
      images.app.tag("${imagetag}");
+     images.app = docker.image("nodejs-demo:${imagetag}")
      
      parallel "Building Docker unit tests image":
      {
@@ -80,8 +81,7 @@ def runAttached(image, args) {
 def testResults(container, stage) {
 
      docker.script.sh "docker logs ${container} > result.txt 2>&1"
-     def result = readFile('result.txt')
-     result = result.trim()
+     def result = docker.script.readFile('result.txt').trim()
      if (result.substring(result.length()-11, result.length()) == 'npm info ok')
      {
           echo "${stage} tests passed"
