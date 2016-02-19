@@ -20,7 +20,7 @@ node {
                containers.app = images.app.run("-i --name ${env.JOB_NAME}-${imagetag}")
                
                stage 'run integration tests'
-               containers.app_tests = runAttached(images.app_tests, "-i --link ${env.JOB_NAME}-${imagetag}:demohost --name ${env.JOB_NAME}-tests-${imagetag} npm run-script int-tests")
+               containers.app_tests = runAttached(images.app_tests, "-i --link ${env.JOB_NAME}-${imagetag}:demohost --name ${env.JOB_NAME}-tests-${imagetag} 'npm run-script int-test'")
                testResults(containers.app_tests)
                
                stage 'publish docker images'
