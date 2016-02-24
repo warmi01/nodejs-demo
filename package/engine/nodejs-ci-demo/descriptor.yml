@@ -5,5 +5,5 @@
 
 
 name: nodejs-ci-demo
-version: 1.0.0.001
+version: @build.number@
 display_name: "NodeJS CI Demo"
