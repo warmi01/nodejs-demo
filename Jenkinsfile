@@ -295,7 +295,7 @@ def sendBuildEvent(type, result, details)
     // Don't fail the job if the event can't be sent 
     try
     {
-        sh "curl -X POST -H \"Content-Type: application/json\" -d '" +
+        sh "curl -sS -X POST -H \"Content-Type: application/json\" -d '" +
             jsonEventPayload + "' " +  buildServiceEventUrl
         echo 'Sent build event "' + type + '" to Build Service URL: ' + buildServiceEventUrl         
     }
