@@ -7,6 +7,11 @@ node {
           runPipeline()         
           sendBuildEvent("JOB_ENDED", "SUCCESS", null)
      }
+     // Handle aborting a job
+     catch (hudson.AbortException e)
+     {
+          sendBuildEvent("JOB_ENDED", "ABORTED", null)
+     }
      catch (all)
      {
           sendBuildEvent("JOB_ENDED", "FAILED", null)
@@ -37,6 +42,11 @@ def runPipeline()
                stage 'publish docker images'
                publishDockerImages(images, imagetag)
           }
+          catch (hudson.AbortException e)
+          {
+              // Need to rethrow exception
+              throw e
+          }
           catch (all)
           {
                error 'Pipeline error'
@@ -64,6 +74,13 @@ def buildImages(images, imagetag) {
           echo 'Docker builds for images successful'         
           sendBuildEvent("BUILD_ENDED", "SUCCESS", null)
      }
+     // Handle aborting a job
+     catch (hudson.AbortException e)
+     {
+         sendBuildEvent("BUILD_ENDED", "ABORTED", null)
+         // Need to rethrow exception
+         throw e
+     }
      catch (all)
      {
           sendBuildEvent("BUILD_ENDED", "FAILED", null)
@@ -86,6 +103,13 @@ def runIntegrationTests(images, imagetag, containers) {
                     
          sendBuildEvent("TEST_ENDED", "SUCCESS", null)
      }
+     // Handle aborting a job
+     catch (hudson.AbortException e)
+     {
+         sendBuildEvent("TEST_ENDED", "ABORTED", null)
+         // Need to rethrow exception
+         throw e
+     }
      catch (all)
      {
          sendBuildEvent("TEST_ENDED", "FAILED", null)
@@ -100,7 +124,14 @@ def runAttached(image, args, command) {
           try {
                docker.script.sh "rm .container"
           }
-          catch (all) {} 
+          catch (hudson.AbortException e)
+          {
+              // Need to rethrow exception
+              throw e
+          }
+          catch (all)
+          {    
+          } 
           
           docker.script.sh "docker run --cidfile=.container ${args != '' ? args : ''} ${image.id} ${command != '' ? command : ''}"
           def container = docker.script.readFile('.container').trim()
@@ -168,7 +199,15 @@ def publishDockerImages(images, imagetag) {
           def detailsParm = [appUrl.toString(), testUrl.toString()]
           sendBuildEvent("PUBLISH_ENDED", "SUCCESS", detailsParm)
      }
-     catch (all) {
+     // Handle aborting a job
+     catch (hudson.AbortException e)
+     {
+         sendBuildEvent("PUBLISH_ENDED", "ABORTED", null)
+         // Need to rethrow exception
+         throw e
+     }
+     catch (all)
+     {
           sendBuildEvent("PUBLISH_ENDED", "FAILED", null)
           echo 'Failed to tag/push to VDR image'
           error 'Failed to tag/push to VDR image'
@@ -193,10 +232,15 @@ def sendBuildEvent(type, result, details)
     try
     {
         eventCallbackUrl = CI_EVENT_CALLBACK
-        if (eventCallbackUrl.empty())
+        if (eventCallbackUrl.isEmpty())
         {
             throw new Exception()
         }
+    }
+    catch (hudson.AbortException e)
+    {
+        // Need to rethrow exception
+        throw e
     }
     catch (all)
     {
@@ -254,6 +298,11 @@ def sendBuildEvent(type, result, details)
         sh "curl -X POST -H \"Content-Type: application/json\" -d '" +
             jsonEventPayload + "' " +  buildServiceEventUrl
         echo 'Sent build event "' + type + '" to Build Service URL: ' + buildServiceEventUrl         
+    }
+    catch (hudson.AbortException e)
+    {
+        // Need to rethrow exception
+        throw e
     }
     catch (all)
     {
