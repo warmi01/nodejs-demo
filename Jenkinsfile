@@ -25,8 +25,7 @@ def runPipeline()
    
           try
           {
-               def version = docker.script.readFile('src/version.txt').trim() 
-               def imagetag = "${version}.${env.BUILD_ID}"
+               def imagetag = "${env.BUILD_ID}"
                
                stage 'build docker images'
                buildImages(images, imagetag)
