@@ -1,15 +1,15 @@
 node {
      // Run the pipeline job
      
-     sendBuildEvent("JOB_STARTED", null, null)
+     sendBuildEvent("JOB_STARTED", null)
      try
      {  
           runPipeline()         
-          sendBuildEvent("JOB_ENDED", "SUCCESS", null)
+          sendBuildEvent("JOB_ENDED", "SUCCESS")
      }
      catch (all)
      {
-          sendBuildEvent("JOB_ENDED", "FAILED", null)
+          sendBuildEvent("JOB_ENDED", "FAILED")
           error 'Pipeline job failed'
      }
 }
@@ -50,7 +50,7 @@ def runPipeline()
 
 def buildImages(images, imagetag) {
 
-     sendBuildEvent("BUILD_STARTED", null, null)
+     sendBuildEvent("BUILD_STARTED", null)
      
      try
      {
@@ -62,18 +62,18 @@ def buildImages(images, imagetag) {
           images.app_tests = docker.build("${env.JOB_NAME}-tests:${imagetag}",'src/demo-app-tests')
 
           echo 'Docker builds for images successful'         
-          sendBuildEvent("BUILD_ENDED", "SUCCESS", null)
+          sendBuildEvent("BUILD_ENDED", "SUCCESS")
      }
      catch (all)
      {
-          sendBuildEvent("BUILD_ENDED", "FAILED", null)
+          sendBuildEvent("BUILD_ENDED", "FAILED")
           error 'Build Images failed'
      }     
 }
 
 def runIntegrationTests(images, imagetag, containers) {
     
-     sendBuildEvent("TEST_STARTED", null, null)
+     sendBuildEvent("TEST_STARTED", null)
                     
      try
      {
@@ -84,11 +84,11 @@ def runIntegrationTests(images, imagetag, containers) {
          containers.app_tests = runAttached(images.app_tests, "-i --link ${env.JOB_NAME}-${imagetag}:demohost --name ${env.JOB_NAME}-tests-${imagetag}", 'npm run-script int-test')
          testResults(containers.app_tests)
                     
-         sendBuildEvent("TEST_ENDED", "SUCCESS", null)
+         sendBuildEvent("TEST_ENDED", "SUCCESS")
      }
      catch (all)
      {
-         sendBuildEvent("TEST_ENDED", "FAILED", null)
+         sendBuildEvent("TEST_ENDED", "FAILED")
          error 'Integration tests failed'
      }
 }
@@ -148,28 +148,21 @@ def cleanup(images, containers) {
 
 def publishDockerImages(images, imagetag) {
 
-     sendBuildEvent("PUBLISH_STARTED", null, null)
+     sendBuildEvent("PUBLISH_STARTED", null)
      
      try {
-          def appUrl
-          def testUrl
-          
           // temporariy use fully qualified VDR name; shorter ose3vdr1 should be used once devops docker changes made
           //docker.withRegistry('http://ose3vdr1.services.slogvpc1.caplatformdev.com:5000', 'docker-registry-login') {
           docker.withRegistry('http://ose3vdr1:5000', 'docker-registry-login') {
                
                images.app.push(imagetag)
                images.app_tests.push(imagetag)
-               
-               appUrl = images.app.imageName()
-               testUrl = images.app_tests.imageName()
           }
           
-          def detailsParm = [appUrl.toString(), testUrl.toString()]
-          sendBuildEvent("PUBLISH_ENDED", "SUCCESS", detailsParm)
+          sendBuildEvent("PUBLISH_ENDED", "SUCCESS")
      }
      catch (all) {
-          sendBuildEvent("PUBLISH_ENDED", "FAILED", null)
+          sendBuildEvent("PUBLISH_ENDED", "FAILED")
           echo 'Failed to tag/push to VDR image'
           error 'Failed to tag/push to VDR image'
      }
@@ -179,10 +172,8 @@ def publishDockerImages(images, imagetag) {
  * Sends a build event to the build service.
  * @param type Stage event type
  * @param result Result for the stage.  Required for ENDED event types
- * @param details (Optional) Event details for certain types:
- * PUBLISH_ENDED - Pass a list containing image repository URLs
  */
-def sendBuildEvent(type, result, details)
+def sendBuildEvent(type, result)
 {
     // Use the Platform Service Registry to communicate with the Build Service.
     // TODO: Remove fallback after testing with deployed Build Service app package
@@ -204,26 +195,6 @@ def sendBuildEvent(type, result, details)
         return    
     }
     
-    def jsonDetails
-    if (details &&
-        type == "PUBLISH_ENDED")
-    {
-        def firstIteration = true
-        
-        // Build JSON image repository URL details from the details image list
-        jsonDetails = "{ \"images\": ["
-        for (imageUrl in details)
-        {
-            if (firstIteration == false)
-            {
-                jsonDetails += ","
-            }
-            jsonDetails += "\"${imageUrl}\""
-            firstIteration = false
-        }
-        jsonDetails += "] }"
-    }
-    
     // Create the URL for the Build Service Event REST API
     def serviceRegistry = env.SERVICE_REGISTRY_HOSTNAME
     def buildServiceServiceRegistryPath = (env.BUILD_SERVICE_SR_PATH ?
@@ -243,7 +214,6 @@ def sendBuildEvent(type, result, details)
                 "\"type\": \"${type}\", " +
                 "\"callback\": \"${eventCallbackUrl}\"" +
                 (result ? ", \"result\": \"${result}\"" : "") +
-                (jsonDetails ? ", \"details\": ${jsonDetails}" : "") +
             " } " +
         "}"
        
