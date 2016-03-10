@@ -180,8 +180,8 @@ def sendBuildEvent(type, result)
     def eventCallbackUrl
     try
     {
-        eventCallbackUrl = CI_EVENT_CALLBACK
-        if (eventCallbackUrl.isEmpty())
+        eventCallbackUrl = CI_EVENT_CALLBACK.trim()
+        if (eventCallbackUrl == "")
         {
             throw new Exception()
         }
