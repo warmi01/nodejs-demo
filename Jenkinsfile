@@ -150,9 +150,7 @@ def publishDockerImages(images, imagetag) {
      sendBuildEvent("PUBLISH_STARTED", null)
      
      try {
-          // temporariy use fully qualified VDR name; shorter ose3vdr1 should be used once devops docker changes made
-          //docker.withRegistry('http://ose3vdr1.services.slogvpc1.caplatformdev.com:5000', 'docker-registry-login') {
-          docker.withRegistry('http://ose3vdr1:5000', 'docker-registry-login') {
+          docker.withRegistry(env.CI_IMAGE_REGISTRY_URL, 'docker-registry-login') {
                
                images.app.push(imagetag)
                images.app_tests.push(imagetag)
