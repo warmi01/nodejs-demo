@@ -9,7 +9,7 @@ node {
      }
      catch (all)
      {
-          sendBuildEvent("JOB_ENDED", "FAILED")
+          sendBuildEvent("JOB_ENDED", "FAILURE")
           error 'Pipeline job failed'
      }
 }
@@ -65,7 +65,7 @@ def buildImages(images, imagetag) {
      }
      catch (all)
      {
-          sendBuildEvent("BUILD_ENDED", "FAILED")
+          sendBuildEvent("BUILD_ENDED", "FAILURE")
           error 'Build Images failed'
      }     
 }
@@ -87,7 +87,7 @@ def runIntegrationTests(images, imagetag, containers) {
      }
      catch (all)
      {
-         sendBuildEvent("TEST_ENDED", "FAILED")
+         sendBuildEvent("TEST_ENDED", "FAILURE")
          error 'Integration tests failed'
      }
 }
@@ -159,7 +159,7 @@ def publishDockerImages(images, imagetag) {
           sendBuildEvent("PUBLISH_ENDED", "SUCCESS")
      }
      catch (all) {
-          sendBuildEvent("PUBLISH_ENDED", "FAILED")
+          sendBuildEvent("PUBLISH_ENDED", "FAILURE")
           echo 'Failed to tag/push to VDR image'
           error 'Failed to tag/push to VDR image'
      }
