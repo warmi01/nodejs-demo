@@ -193,8 +193,9 @@ def sendBuildEvent(type, result)
     
     // Create the URL for the Build Service Event REST API
     def serviceRegistry = env.SERVICE_REGISTRY_HOSTNAME
-    def buildServiceServiceRegistryPath = (env.BUILD_SERVICE_SR_PATH ?
-        env.BUILD_SERVICE_SR_PATH : "/default/ci/buildservice")
+    def buildServiceServiceRegistryPath =
+        (env.BUILD_SERVICE_SR_PATH || env.BUILD_SERVICE_SR_PATH == "" ?
+            env.BUILD_SERVICE_SR_PATH : "/default/ci/buildservice")
     
     def buildServiceUrl = "http://" + serviceRegistry + buildServiceServiceRegistryPath
     def buildServiceApiPath = "/jobs/${env.JOB_NAME}/builds/${env.BUILD_ID}/events" 
