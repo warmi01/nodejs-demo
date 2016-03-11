@@ -173,7 +173,6 @@ def publishDockerImages(images, imagetag) {
 def sendBuildEvent(type, result)
 {
     // Use the Platform Service Registry to communicate with the Build Service.
-    // TODO: Remove fallback after testing with deployed Build Service app package
  
     // Get the event callback URL from the Jenkins job parameter.
     // Test existence of the parameter by trying to access it.
@@ -196,12 +195,8 @@ def sendBuildEvent(type, result)
     def serviceRegistry = env.SERVICE_REGISTRY_HOSTNAME
     def buildServiceServiceRegistryPath = (env.BUILD_SERVICE_SR_PATH ?
         env.BUILD_SERVICE_SR_PATH : "/default/ci/buildservice")
-    def buildServiceHost = env.BUILD_SERVICE_SERVICE_HOST
-    def buildServicePort = env.BUILD_SERVICE_SERVICE_PORT
     
-    def buildServiceUrl = (serviceRegistry ?
-        "http://" + serviceRegistry + buildServiceServiceRegistryPath :
-        "http://" + buildServiceHost + ":" + buildServicePort)
+    def buildServiceUrl = "http://" + serviceRegistry + buildServiceServiceRegistryPath
     def buildServiceApiPath = "/jobs/${env.JOB_NAME}/builds/${env.BUILD_ID}/events" 
     def buildServiceEventUrl = buildServiceUrl + buildServiceApiPath
     
