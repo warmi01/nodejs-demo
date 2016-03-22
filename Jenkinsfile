@@ -68,6 +68,8 @@ def buildImages(images, imagetag) {
           images.app.tag("${imagetag}")
           images.app = docker.image("${env.JOB_NAME}:${imagetag}")
             
+          // Modify test dockerfile to match JOB_NAME
+          sh "sed -i 's/nodejs-demo/${env.JOB_NAME}/g' ${root}demo-app-tests/Dockerfile"
           images.app_tests = docker.build("${env.JOB_NAME}-tests:${imagetag}", "${root}demo-app-tests")
 
           echo 'Docker builds for images successful'         
