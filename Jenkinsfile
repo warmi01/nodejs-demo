@@ -64,13 +64,13 @@ def buildImages(images, imagetag) {
      try
      {
           // Build demo app image first (latest used as test image base)
-          images.app = docker.build("${env.JOB_NAME}", "{$root}demo-app")
+          images.app = docker.build("${env.JOB_NAME}", "{$root}src/demo-app")
           images.app.tag("${imagetag}")
           images.app = docker.image("${env.JOB_NAME}:${imagetag}")
             
           // Modify test dockerfile to match JOB_NAME
-          sh "sed -i 's/nodejs-demo/${env.JOB_NAME}/g' ${root}demo-app-tests/Dockerfile"
-          images.app_tests = docker.build("${env.JOB_NAME}-tests:${imagetag}", "${root}demo-app-tests")
+          sh "sed -i 's/nodejs-demo/${env.JOB_NAME}/g' ${root}src/demo-app-tests/Dockerfile"
+          images.app_tests = docker.build("${env.JOB_NAME}-tests:${imagetag}", "${root}src/demo-app-tests")
 
           echo 'Docker builds for images successful'         
           sendBuildEvent("BUILD_ENDED", "SUCCESS")
