@@ -47,18 +47,28 @@ def runPipeline()
      }
 }
 
+def getRootPath() {
+	def path = CI_ROOT_PATH.trim()
+	if (path != "") 
+	{
+		path = path + '/'
+	}
+	return path
+}
+
 def buildImages(images, imagetag) {
 
      sendBuildEvent("BUILD_STARTED", null)
+     def root = getRootPath()
      
      try
      {
           // Build demo app image first (latest used as test image base)
-          images.app = docker.build("${env.JOB_NAME}",'src/demo-app')
+          images.app = docker.build("${env.JOB_NAME}", "{$root}demo-app")
           images.app.tag("${imagetag}")
           images.app = docker.image("${env.JOB_NAME}:${imagetag}")
             
-          images.app_tests = docker.build("${env.JOB_NAME}-tests:${imagetag}",'src/demo-app-tests')
+          images.app_tests = docker.build("${env.JOB_NAME}-tests:${imagetag}", "${root}demo-app-tests")
 
           echo 'Docker builds for images successful'         
           sendBuildEvent("BUILD_ENDED", "SUCCESS")
