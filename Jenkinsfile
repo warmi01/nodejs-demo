@@ -58,10 +58,10 @@ def getRootPath() {
           }
      }
      catch (all) {
-          echo 'CI_ROOTPATH is not set; using default'
+          echo 'CI_ROOT_PATH is not set; using default'
      }
 
-     echo "CI_ROOTPATH set to '${path}'" 
+     echo "CI_ROOT_PATH set to '${path}'" 
 
      return path
 }
