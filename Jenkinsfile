@@ -48,12 +48,13 @@ def runPipeline()
 }
 
 def getRootPath() {
-	def path = CI_ROOT_PATH.trim()
-	if (path != "") 
-	{
-		path = path + '/'
-	}
-	return path
+     def path = (CI_ROOT_PATH ? CI_ROOT_PATH.trim() : '')
+     if (path != "") 
+     {
+     	path = path + '/'
+     }
+     
+     return path
 }
 
 def buildImages(images, imagetag) {
