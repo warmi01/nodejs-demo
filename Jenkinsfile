@@ -73,13 +73,6 @@ def buildImages(images, imagetag) {
      
      try
      {
-          echo 'before dockerfile mod'
-          sh "cat ${root}src/demo-app-tests/Dockerfile"
-          sh "sed -i 's/nodejs-demo/${env.JOB_NAME}/g' ${root}src/demo-app-tests/Dockerfile"
-          echo 'after dockerfile mod'
-          sh "cat ${root}src/demo-app-tests/Dockerfile"
-
-          
           // Build demo app image first (latest used as test image base)
           images.app = docker.build("${env.JOB_NAME}", "${root}src/demo-app")
           images.app.tag("${imagetag}")
