@@ -64,7 +64,7 @@ def buildImages(images, imagetag) {
      try
      {
           // Build demo app image first (latest used as test image base)
-          images.app = docker.build("${env.JOB_NAME}", "{$root}src/demo-app")
+          images.app = docker.build("${env.JOB_NAME}", "${root}src/demo-app")
           images.app.tag("${imagetag}")
           images.app = docker.image("${env.JOB_NAME}:${imagetag}")
             
