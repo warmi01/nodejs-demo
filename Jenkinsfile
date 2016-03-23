@@ -48,12 +48,21 @@ def runPipeline()
 }
 
 def getRootPath() {
-     def path = (CI_ROOT_PATH ? CI_ROOT_PATH.trim() : '')
-     if (path != "") 
-     {
-     	path = path + '/'
-     }
+     def path = ''
      
+     try {
+          path = CI_ROOT_PATH.trim()
+          if (path != '') 
+          {
+          	path = path + '/'
+          }
+     }
+     catch (all) {
+          echo 'CI_ROOTPATH is not set; using default'
+     }
+
+     echo "CI_ROOTPATH set to '${path}'" 
+
      return path
 }
 
