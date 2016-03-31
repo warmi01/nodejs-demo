@@ -1,6 +1,8 @@
 
 var request = require('supertest'),
-	request = request('http://demohost:3000'); // --link nodejs-demo:demohost
+    // Request URL based on environment variable otherwise localhost
+    appUrl = process.env.CI_APP_URL || 'http://localhost:3000',
+	request = request(appUrl);
 
 describe('app', function(){
 

@@ -102,7 +102,7 @@ def runIntegrationTests(images, imagetag, containers) {
          echo 'Running demo app..'
          containers.app = images.app.run("-i --name ${env.JOB_NAME}-${imagetag}")
             
-         containers.app_tests = runAttached(images.app_tests, "-i --link ${env.JOB_NAME}-${imagetag}:demohost --name ${env.JOB_NAME}-tests-${imagetag}", 'npm run-script int-test')
+         containers.app_tests = runAttached(images.app_tests, "-i --link ${env.JOB_NAME}-${imagetag}:demohost -e CI_APP_URL=http://demohost:3000 --name ${env.JOB_NAME}-tests-${imagetag}", 'npm run-script int-test')
          testResults(containers.app_tests)
                     
          sendBuildEvent("TEST_ENDED", "SUCCESS")
